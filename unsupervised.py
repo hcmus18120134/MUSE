@@ -32,10 +32,10 @@ parser.add_argument("--exp_id", type=str, default="", help="Experiment ID")
 parser.add_argument("--cuda", type=bool_flag, default=True, help="Run on GPU")
 parser.add_argument("--export", type=str, default="txt", help="Export embeddings after training (txt / pth)")
 # data
-parser.add_argument("--src_lang", type=str, default='en', help="Source language")
-parser.add_argument("--tgt_lang", type=str, default='es', help="Target language")
-parser.add_argument("--emb_dim", type=int, default=300, help="Embedding dimension")
-parser.add_argument("--max_vocab", type=int, default=200000, help="Maximum vocabulary size (-1 to disable)")
+parser.add_argument("--src_lang", type=str, default='zh', help="Source language")
+parser.add_argument("--tgt_lang", type=str, default='en', help="Target language")
+parser.add_argument("--emb_dim", type=int, default=500, help="Embedding dimension")
+parser.add_argument("--max_vocab", type=int, default=-1, help="Maximum vocabulary size (-1 to disable)")
 # mapping
 parser.add_argument("--map_id_init", type=bool_flag, default=True, help="Initialize the mapping as an identity matrix")
 parser.add_argument("--map_beta", type=float, default=0.001, help="Beta for orthogonalization")
@@ -46,7 +46,7 @@ parser.add_argument("--dis_dropout", type=float, default=0., help="Discriminator
 parser.add_argument("--dis_input_dropout", type=float, default=0.1, help="Discriminator input dropout")
 parser.add_argument("--dis_steps", type=int, default=5, help="Discriminator steps")
 parser.add_argument("--dis_lambda", type=float, default=1, help="Discriminator loss feedback coefficient")
-parser.add_argument("--dis_most_frequent", type=int, default=75000, help="Select embeddings of the k most frequent words for discrimination (0 to disable)")
+parser.add_argument("--dis_most_frequent", type=int, default=25000, help="Select embeddings of the k most frequent words for discrimination (0 to disable)")
 parser.add_argument("--dis_smooth", type=float, default=0.1, help="Discriminator smooth predictions")
 parser.add_argument("--dis_clip_weights", type=float, default=0, help="Clip discriminator weights (0 to disable)")
 # training adversarial
@@ -72,7 +72,7 @@ parser.add_argument("--dico_max_size", type=int, default=0, help="Maximum genera
 # reload pre-trained embeddings
 parser.add_argument("--src_emb", type=str, default="", help="Reload source embeddings")
 parser.add_argument("--tgt_emb", type=str, default="", help="Reload target embeddings")
-parser.add_argument("--normalize_embeddings", type=str, default="", help="Normalize embeddings before training")
+parser.add_argument("--normalize_embeddings", type=str, default="center", help="Normalize embeddings before training")
 
 
 # parse parameters
@@ -143,6 +143,7 @@ if params.adversarial:
         logger.info("__log__:%s" % json.dumps(to_log))
         trainer.save_best(to_log, VALIDATION_METRIC)
         logger.info('End of epoch %i.\n\n' % n_epoch)
+        trainer.export()
 
         # update the learning rate (stop if too small)
         trainer.update_lr(to_log, VALIDATION_METRIC)
@@ -178,7 +179,7 @@ if params.n_refinement > 0:
         logger.info("__log__:%s" % json.dumps(to_log))
         trainer.save_best(to_log, VALIDATION_METRIC)
         logger.info('End of refinement iteration %i.\n\n' % n_iter)
-
+        trainer.export()
 
 # export embeddings
 if params.export:
