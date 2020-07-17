@@ -227,11 +227,11 @@ class Trainer(object):
             logger.info('* Saving the mapping to %s ...' % path)
             torch.save(W, path)
 
-    def reload_best(self):
+    def reload_best(self, path):
         """
         Reload the best mapping.
         """
-        path = os.path.join(self.params.exp_path, 'best_mapping.pth')
+        # path = os.path.join(self.params.exp_path, 'best_mapping.pth')
         logger.info('* Reloading the best model from %s ...' % path)
         # reload the model
         assert os.path.isfile(path)
